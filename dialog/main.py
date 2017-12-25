@@ -7,7 +7,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 from PIL import Image
 
-from util import center_window, native_path_format, load_config, store_config
+from util import center_window, native_path_format, load_config, store_config, logger
 from i18n import i18n
 from .display import ImageDisplayFrame
 
@@ -79,7 +79,7 @@ class MainDialog:
         try:
             im = Image.open(filepath)
         except:
-            # TODO: log errors?
+            logger.exception(i18n['invalid_image'])
             messagebox.showerror(i18n['open_failed'], i18n['invalid_image'])
         else:
             self.current_file = filepath
@@ -92,9 +92,9 @@ class MainDialog:
         try:
             self.im.save(self.current_file)
         except:
-            # TODO: log errors?
-            messagebox.showerror(i18n['save_failed_title'],
-                i18n['save_failed_content'] % (native_path_format(self.current_file)))
+            error_content = i18n['save_failed_content'] % (native_path_format(self.current_file))
+            logger.exception(error_content)
+            messagebox.showerror(i18n['save_failed_title'], error_content)
 
     def save_file_as(self, event = None):
         if not self.im:
@@ -108,8 +108,9 @@ class MainDialog:
         try:
             self.im.save(filepath)
         except:
-            # TODO: log errors?
-            messagebox.showerror(i18n['save_as_failed_title'], i18n['save_as_failed_content'] % (native_path_format(filepath)))
+            error_content = i18n['save_as_failed_content'] % (native_path_format(filepath))
+            logger.exception(error_content)
+            messagebox.showerror(i18n['save_as_failed_title'], error_content)
 
     def on_close(self, event = None):
         self.window.quit()

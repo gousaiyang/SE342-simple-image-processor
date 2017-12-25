@@ -1,6 +1,8 @@
 import json
 
+from i18n import i18n
 from .util import file_content, write_file
+from .log import logger
 
 config_filename = 'config.json'
 
@@ -11,7 +13,7 @@ def load_config():
         assert isinstance(data['language'], str)
         return data
     except:
-        # TODO: log errors?
+        logger.warning(i18n['load_config_failed'])
         return {'recent_dir': '.', 'language': ''}
 
 def store_config(new_config):
@@ -20,5 +22,4 @@ def store_config(new_config):
     try:
         write_file(config_filename, json.dumps(config, indent = 4, ensure_ascii = False))
     except:
-        # TODO: log errors?
-        pass
+        logger.exception(i18n['store_config_failed'], config_filename)
