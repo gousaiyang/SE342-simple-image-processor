@@ -4,6 +4,15 @@ import platform
 
 is_windows = platform.system() == 'Windows'
 
+def file_content(filename, encoding = 'utf-8'):
+    with open(filename, 'rb') as fin:
+        content = fin.read()
+    return content.decode(encoding)
+
+def write_file(filename, content, encoding = 'utf-8'):
+    with open(filename, 'wb') as fout:
+        fout.write(content.encode(encoding))
+
 def max_rect_2(rect1, rect2):
     return (max(rect1[0], rect2[0]), max(rect1[1], rect2[1]))
 
