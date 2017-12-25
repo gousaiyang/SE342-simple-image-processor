@@ -6,45 +6,53 @@ from .resources import *
 
 resource_suffix = '_resources'
 
-all_languages = [name[:-len(resource_suffix)] for name, obj in globals().items()
+_all_languages = [name[:-len(resource_suffix)] for name, obj in globals().items()
     if name.endswith(resource_suffix) and isinstance(obj, dict) and 'language_name' in obj]
-i18n_resources = {l: globals()[l + resource_suffix] for l in all_languages}
+i18n_resources = {l: globals()[l + resource_suffix] for l in _all_languages}
 
-default_language = 'en'
+_default_language = 'en'
 
 class I18N:
     def __init__(self):
         default_locale = locale.getdefaultlocale()[0]
-        self.language = default_locale if default_locale in all_languages else default_language
+        self._language = default_locale if default_locale in _all_languages else _default_language
 
-    def get_all_languages(self):
-        return all_languages
+    @property
+    def all_languages(self):
+        return _all_languages
 
-    def get_all_language_names(self):
-        return [i18n_resources[l]['language_name'] for l in all_languages]
+    @property
+    def all_language_names(self):
+        return [i18n_resources[l]['language_name'] for l in _all_languages]
 
-    def get_default_language(self):
-        return default_language
+    @property
+    def default_language(self):
+        return _default_language
 
-    def get_language(self):
-        return self.language
+    @property
+    def language(self):
+        return self._language
 
-    def set_language(self, language):
-        if language not in all_languages:
+    @language.setter
+    def language(self, new_language):
+        if new_language not in _all_languages:
+            raise NameError('Language %s does not exist in the resource file.' % (new_language))
+
+        self._language = new_language
+
+    def reset_default(self):
+        self._language = _default_language
+
+    def get(self, entry, language = None):
+        if language is not None and language not in _all_languages:
             raise NameError('Language %s does not exist in the resource file.' % (language))
 
-        self.language = language
+        return i18n_resources[language or self._language][entry]
 
-    def set_to_default_language(self):
-        self.language = default_language
-
-    def get(self, entry, language=None):
-        if language is not None and language not in all_languages:
-            raise NameError('Language %s does not exist in the resource file.' % (language))
-
-        return i18n_resources[language or self.language][entry]
+    def __getitem__(self, entry):
+        return self.get(entry)
 
     def __contains__(self, language):
-        return language in all_languages
+        return language in _all_languages
 
 i18n = I18N()
