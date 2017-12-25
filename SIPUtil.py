@@ -14,7 +14,11 @@ def get_window_size(window):
 def center_window(window):
     size = get_window_size(window)
     pos = (window.winfo_screenwidth() - size[0]) // 2, (window.winfo_screenheight() - size[1]) // 2
-    window.geometry("%dx%d+%d+%d" % (size + pos))
+    window.geometry('%dx%d+%d+%d' % (size + pos))
+
+def try_pack_forget(window):
+    if window.winfo_manager() == 'pack':
+        window.pack_forget()
 
 def native_path_format(path):
     return path.replace('/', '\\') if is_windows else path

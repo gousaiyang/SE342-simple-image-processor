@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk
 
-from SIPHelper import max_rect_2, get_window_size
+from SIPUtil import max_rect_2, get_window_size, try_pack_forget
 
 class ImageDisplayFrame:
     def __init__(self, parent):
@@ -11,7 +11,6 @@ class ImageDisplayFrame:
         self.frame_upper = ttk.Frame(self.frame)
         self.frame_lower = ttk.Frame(self.frame)
 
-        # TODO: Auto hide scrollbars when unnecessary?
         self.canvas = tk.Canvas(self.frame_upper, highlightthickness = 0)
         self.scroll_v = ttk.Scrollbar(self.frame_upper, orient = tk.VERTICAL)
         self.scroll_v.config(command = self.canvas.yview)
@@ -27,19 +26,49 @@ class ImageDisplayFrame:
 
         self.im = None
         self.imagetk = None
+        self.scrollbar_info = None
+
+    def pack_components(self, scrollbar_info):
+        if self.scrollbar_info != scrollbar_info:
+            self.scrollbar_info = scrollbar_info
+
+            self.pack_forget_components()
+
+            self.frame_upper.pack(fill = tk.BOTH, expand = 1)
+            if scrollbar_info[1]:
+                self.scroll_v.pack(side = tk.RIGHT, fill = tk.Y, expand = 0)
+            self.canvas.pack(side = tk.LEFT, fill = tk.BOTH, expand = 1)
+            if scrollbar_info[0]:
+                self.frame_lower.pack(fill = tk.X, expand = 0)
+                if scrollbar_info[1]:
+                    self.sizegrip.pack(side = tk.RIGHT)
+                self.scroll_h.pack(side = tk.BOTTOM, fill = tk.X, expand = 0)
+            self.image_label.place(relx = 0.5, rely = 0.5, anchor = tk.CENTER)
+
+    def pack_forget_components(self):
+        try_pack_forget(self.sizegrip)
+        try_pack_forget(self.scroll_h)
+        try_pack_forget(self.frame_lower)
+        try_pack_forget(self.scroll_v)
+        try_pack_forget(self.image_label)
+        try_pack_forget(self.canvas)
+        try_pack_forget(self.frame_upper)
 
     def pack(self):
         self.frame.pack(fill = tk.BOTH, expand = 1)
-        self.frame_upper.pack(fill = tk.BOTH, expand = 1)
-        self.scroll_v.pack(side = tk.RIGHT, fill = tk.Y, expand = 0)
-        self.canvas.pack(side = tk.LEFT, fill = tk.BOTH, expand = 1)
-        self.frame_lower.pack(fill = tk.X, expand = 0)
-        self.sizegrip.pack(side = tk.RIGHT)
-        self.scroll_h.pack(side = tk.BOTTOM, fill = tk.X, expand = 0)
-        self.image_label.place(relx = 0.5, rely = 0.5, anchor = tk.CENTER)
+        self.pack_components((True, True))
+
+    def pack_forget(self):
+        self.pack_forget_components()
+        self.frame.pack_forget()
+        self.scrollbar_info = None
 
     def update_size(self):
-        new_canvas_scroll_size = max_rect_2(get_window_size(self.canvas), self.im.size if self.im else (0, 0))
+        canvas_size = get_window_size(self.canvas)
+        image_size = self.im.size if self.im else (0, 0)
+        self.pack_components((image_size[0] > canvas_size[0], image_size[1] > canvas_size[1]))
+        canvas_size = get_window_size(self.canvas)
+        new_canvas_scroll_size = max_rect_2(canvas_size, image_size)
         self.canvas.config(scrollregion = (0, 0) + new_canvas_scroll_size)
         self.image_frame.config(width = new_canvas_scroll_size[0], height = new_canvas_scroll_size[1])
 

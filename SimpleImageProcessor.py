@@ -7,7 +7,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 from PIL import Image
 
-from SIPHelper import center_window, native_path_format
+from SIPUtil import center_window, native_path_format
 from SIPImageDisplayFrame import ImageDisplayFrame
 
 allowed_filetypes = [('Image Files', '*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tiff;*.webp'), ('All Files', '*.*')]
