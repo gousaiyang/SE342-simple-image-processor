@@ -26,6 +26,7 @@ class MainDialog:
         if self.config['language'] in i18n:
             i18n.language = self.config['language']
         self.current_file = ''
+        self.file_modified = None
 
     def init_window(self):
         self.window = tk.Tk()
@@ -49,14 +50,14 @@ class MainDialog:
         self.menu.add_cascade(label = i18n['file'], menu = self.file_menu)
         self.file_menu.add_command(label = i18n['open'], command = self.open_file, accelerator = 'Ctrl+O')
         self.window.bind('<Control-o>', self.open_file)
-        self.file_menu.add_command(label = i18n['save'], command = self.save_file, accelerator = 'Ctrl+S')
+        self.file_menu.add_command(label = i18n['save'], command = self.save_file, accelerator = 'Ctrl+S', state = 'disabled')
         self.window.bind('<Control-s>', self.save_file)
-        self.file_menu.add_command(label = i18n['save_as'], command = self.save_file_as)
+        self.file_menu.add_command(label = i18n['save_as'], command = self.save_file_as, state = 'disabled')
         self.file_menu.add_separator()
         self.file_menu.add_command(label = i18n['exit'], command = self.on_close, accelerator = 'Alt+F4')
 
         self.image_display = ImageDisplayFrame(self.window)
-        self.image_display.pack()
+        self.image_display.pack(fill = tk.BOTH, expand = 1)
 
         self.status_bar = tk.Label(self.window, text = '# Cursor pos and RGB here...', bd = 1, relief = tk.SUNKEN, anchor = tk.W)
         self.status_bar.pack(side = tk.BOTTOM, fill = tk.X)
@@ -85,10 +86,13 @@ class MainDialog:
             self.current_file = filepath
             self.window.title(i18n['main_window_title'] + ' - ' + native_path_format(filepath))
             self.im = im
+            self.file_menu.entryconfigure(1, state = 'normal')
+            self.file_menu.entryconfigure(2, state = 'normal')
+            self.file_modified = False
 
     def save_file(self, event = None):
-        if not self.im:
-            return # NOTE: Should we disable menu item?
+        if not self.im or not self.file_modified:
+            return
         try:
             self.im.save(self.current_file)
         except:

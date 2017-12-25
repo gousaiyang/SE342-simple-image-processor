@@ -54,8 +54,8 @@ class ImageDisplayFrame:
         try_pack_forget(self.canvas)
         try_pack_forget(self.frame_upper)
 
-    def pack(self):
-        self.frame.pack(fill = tk.BOTH, expand = 1)
+    def pack(self, *args, **kw):
+        self.frame.pack(*args, **kw)
         self.pack_components((True, True))
 
     def pack_forget(self):
