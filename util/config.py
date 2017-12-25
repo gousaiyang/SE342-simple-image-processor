@@ -1,6 +1,6 @@
 import json
 
-from SIPUtil import file_content, write_file
+from .util import file_content, write_file
 
 config_filename = 'config.json'
 

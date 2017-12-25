@@ -2,7 +2,7 @@
 
 import locale
 
-from SIPI18NResources import *
+from .resources import *
 
 resource_suffix = '_resources'
 

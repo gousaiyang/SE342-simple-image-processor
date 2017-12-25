@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk
 
-from SIPUtil import max_rect_2, get_window_size, try_pack_forget
+from util import max_rect_2, get_window_size, try_pack_forget
 
 class ImageDisplayFrame:
     def __init__(self, parent):
