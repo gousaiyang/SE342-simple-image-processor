@@ -7,7 +7,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 from PIL import Image
 
-from util import center_window, native_path_format, load_config, store_config, logger
+from util import point_in_rect, center_window, cursor_pos_toplevel, native_path_format, load_config, store_config, logger
 from i18n import i18n
 from .display import ImageDisplayFrame
 
@@ -59,8 +59,10 @@ class MainDialog:
         self.image_display = ImageDisplayFrame(self.window)
         self.image_display.pack(fill = tk.BOTH, expand = 1)
 
-        self.status_bar = tk.Label(self.window, text = '# Cursor pos and RGB here...', bd = 1, relief = tk.SUNKEN, anchor = tk.W)
+        self.status_bar = tk.Label(self.window, bd = 1, relief = tk.SUNKEN, anchor = tk.W)
         self.status_bar.pack(side = tk.BOTTOM, fill = tk.X)
+
+        self.window.bind('<Motion>', self.on_mouse_move)
 
     @property
     def im(self):
@@ -115,6 +117,17 @@ class MainDialog:
             error_content = i18n['save_as_failed_content'] % (native_path_format(filepath))
             logger.exception(error_content)
             messagebox.showerror(i18n['save_as_failed_title'], error_content)
+
+    def on_mouse_move(self, event):
+        if self.im and point_in_rect(cursor_pos_toplevel(self.window), self.image_display.image_rect):
+            cursor_pos = self.image_display.cursor_pos
+            cursor_rgb = self.image_display.cursor_rgb
+            if cursor_pos and cursor_rgb:
+                self.status_bar.config(text = i18n['pos_and_rgb'] % (cursor_pos + cursor_rgb))
+            else:
+                self.status_bar.config(text = '')
+        else:
+            self.status_bar.config(text = '')
 
     def on_close(self, event = None):
         self.window.quit()

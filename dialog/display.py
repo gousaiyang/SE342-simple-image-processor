@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk
 
-from util import max_rect_2, get_window_size, try_pack_forget
+from util import max_rect_2, get_window_size, get_window_rect, try_pack_forget
 
 class ImageDisplayFrame:
     def __init__(self, parent):
@@ -23,10 +23,12 @@ class ImageDisplayFrame:
         self.image_frame = ttk.Frame(self.canvas)
         self.image_window = self.canvas.create_window(0, 0, window = self.image_frame, anchor = tk.NW)
         self.image_label = ttk.Label(self.image_frame)
+        self.image_label.bind('<Motion>', self.on_mouse_move)
 
         self.im = None
         self.imagetk = None
         self.scrollbar_info = None
+        self.cursor_pos = None
 
     def pack_components(self, scrollbar_info):
         if self.scrollbar_info != scrollbar_info:
@@ -77,6 +79,21 @@ class ImageDisplayFrame:
         self.update_size()
         self.imagetk = ImageTk.PhotoImage(self.im)
         self.image_label.config(image = self.imagetk)
+        self.px = im.load()
 
     def on_resize_canvas(self, event):
         self.update_size()
+
+    def on_mouse_move(self, event):
+        self.cursor_pos = (event.x, event.y)
+
+    @property
+    def cursor_rgb(self):
+        try:
+            return self.px[self.cursor_pos]
+        except:
+            return None
+
+    @property
+    def image_rect(self):
+        return get_window_rect(self.image_label)

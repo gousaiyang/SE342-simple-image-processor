@@ -17,7 +17,8 @@ en_resources = {
     'save_failed_content': 'Error occurred while saving to file "%s".',
     'save_as_failed_content': 'Error occurred while saving to file "%s".',
     'load_config_failed': 'Failed to load config, using default value.',
-    'store_config_failed': 'Failed to store config to file "%s".'
+    'store_config_failed': 'Failed to store config to file "%s".',
+    'pos_and_rgb': 'Position: (%d, %d)  Color: RGB(%d, %d, %d)'
 }
 
 zh_CN_resources = {
@@ -37,5 +38,6 @@ zh_CN_resources = {
     'save_failed_content': '保存到文件 "%s" 时发生错误。',
     'save_as_failed_content': '保存副本到文件 "%s" 时发生错误。',
     'load_config_failed': '读取配置文件失败，将使用默认配置。',
-    'store_config_failed': '写入配置文件 "%s" 时发生错误。'
+    'store_config_failed': '写入配置文件 "%s" 时发生错误。',
+    'pos_and_rgb': '坐标：(%d, %d)  颜色：RGB(%d, %d, %d)'
 }
