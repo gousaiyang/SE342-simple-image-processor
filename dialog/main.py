@@ -17,18 +17,31 @@ allowed_filetypes = [(i18n['image_files'], '*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tif
 
 def show_image_mode(im):
     mode = get_image_mode(im)
-    if mode == ImageMode.COLOR:
-        return i18n['color'] + '(%s)' % (im.mode)
-    elif mode == ImageMode.GRAYSCALE:
-        return i18n['grayscale'] + '(%s)' % (im.mode)
-    elif mode == ImageMode.BINARY:
-        return i18n['binary'] + '(%s)' % (im.mode)
+    if mode in [ImageMode.BINARY, ImageMode.GRAYSCALE, ImageMode.COLOR]:
+        return [i18n['binary'], i18n['grayscale'], i18n['color']][mode - 1] + '(%s)' % (im.mode)
     else:
         raise TypeError(i18n['invalid_image'])
-        return None
 
 def show_pixel_value(v, mode):
     return ('RGB(%d, %d, %d)' % (v)) if mode == ImageMode.COLOR else v
+
+def transform_method(func):
+    @functools.wraps(func)
+    def wrapper(self, *args, **kw):
+        if not self.im:
+            return
+
+        try:
+            r = func(self, *args, **kw)
+        except Exception as e:
+            logger.exception(e)
+            messagebox.showwarning(i18n['error'], e)
+        else:
+            self.im = self.version.current_version
+            self.update_title()
+            self.update_status_bar()
+            return r
+    return wrapper
 
 class MainDialog:
     def __init__(self):
@@ -93,6 +106,7 @@ class MainDialog:
         self.split_rgb_menu.add_command(label = i18n['R'], command = functools.partial(self.split_rgb, band = 'R'))
         self.split_rgb_menu.add_command(label = i18n['G'], command = functools.partial(self.split_rgb, band = 'G'))
         self.split_rgb_menu.add_command(label = i18n['B'], command = functools.partial(self.split_rgb, band = 'B'))
+        self.color_image_processing_menu.add_command(label = i18n['color2grayscale'], command = self.color2grayscale)
 
         self.detection_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['detection'], menu = self.detection_menu)
@@ -199,37 +213,21 @@ class MainDialog:
     def on_mouse_move(self, event = None):
         self.update_status_bar()
 
+    @transform_method
     def undo(self, event = None):
-        if not self.im:
-            return
-
         self.version.undo()
-        self.im = self.version.current_version
-        self.update_title()
-        self.update_status_bar()
 
+    @transform_method
     def redo(self, event = None):
-        if not self.im:
-            return
-
         self.version.redo()
-        self.im = self.version.current_version
-        self.update_title()
-        self.update_status_bar()
 
+    @transform_method
     def split_rgb(self, event = None, *, band):
-        if not self.im:
-            return
+        self.version.add(transformation.get_band(self.im, band))
 
-        try:
-            self.version.add(transformation.get_band(self.im, band))
-        except Exception as e:
-            logger.warning(e)
-            messagebox.showwarning(i18n['error'], e)
-        else:
-            self.im = self.version.current_version
-            self.update_title()
-            self.update_status_bar()
+    @transform_method
+    def color2grayscale(self, event = None):
+        self.version.add(transformation.color2grayscale(self.im))
 
     def on_close(self, event = None):
         if self.im and self.version.unsaved:

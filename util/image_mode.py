@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from enum import Enum
+import functools
+from enum import IntEnum
 
 from i18n import i18n
 
-class ImageMode(Enum):
+class ImageMode(IntEnum):
     INVALID = 0
     BINARY = 1
     GRAYSCALE = 2
@@ -20,9 +21,6 @@ def get_image_mode(im):
     else:
         return ImageMode.INVALID
 
-def is_rgb_mode(im):
-    return im.mode == 'RGB'
-
 def canonical_mode(im):
     mode = get_image_mode(im)
     if mode == ImageMode.COLOR:
@@ -34,3 +32,18 @@ def canonical_mode(im):
     else:
         raise TypeError(i18n['invalid_image'])
         return None
+
+def check_image_mode(mode):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(im, *args, **kw):
+            if get_image_mode(im) != mode:
+                if mode in [ImageMode.BINARY, ImageMode.GRAYSCALE, ImageMode.COLOR]:
+                    expected_mode_name = [i18n['binary'], i18n['grayscale'], i18n['color']][mode - 1]
+                    error_message = i18n['some_image_mode_expected'] % (expected_mode_name)
+                else:
+                    error_message = i18n['invalid_image']
+                raise TypeError(error_message)
+            return func(im, *args, **kw)
+        return wrapper
+    return decorator
