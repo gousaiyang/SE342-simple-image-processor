@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from dialog import MainDialog
 
 if __name__ == '__main__':

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from util import *
 from i18n import i18n
 

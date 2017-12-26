@@ -8,10 +8,10 @@ from tkinter import filedialog
 from tkinter import messagebox
 from PIL import Image
 
+import transformation
 from util import *
 from i18n import i18n
-import transformation
-from .display import ImageDisplayFrame
+from .image_display import ImageDisplayFrame
 
 allowed_filetypes = [(i18n['image_files'], '*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tiff;*.webp'), (i18n['all_files'], '*.*')]
 
@@ -222,12 +222,13 @@ class MainDialog:
 
         try:
             self.version.add(transformation.get_band(self.im, band))
+        except Exception as e:
+            logger.warning(e)
+            messagebox.showwarning(i18n['error'], e)
+        else:
             self.im = self.version.current_version
             self.update_title()
             self.update_status_bar()
-        except Exception as e:
-            logger.exception(e)
-            messagebox.showwarning(i18n['error'], e)
 
     def on_close(self, event = None):
         self.window.quit()

@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import json
 
 from i18n import i18n
-from .util import file_content, write_file
+from .file_util import file_content, write_file
 from .log import logger
 
 config_filename = 'config.json'

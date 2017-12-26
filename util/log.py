@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import logging
 
 log_filename = 'error.log'

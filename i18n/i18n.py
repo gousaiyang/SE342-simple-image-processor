@@ -12,6 +12,12 @@ i18n_resources = {l: globals()[l + resource_suffix] for l in _all_languages}
 
 _default_language = 'en'
 
+if _default_language not in _all_languages:
+    raise KeyError('Default language does not exist in the resource file!')
+for l in _all_languages:
+    if set(i18n_resources[l].keys()) != set(i18n_resources[_default_language].keys()):
+        raise KeyError('Inconsistent keys between "%s" resources and "%s" resources.' % (l, _default_language))
+
 class I18N:
     def __init__(self):
         default_locale = locale.getdefaultlocale()[0]
