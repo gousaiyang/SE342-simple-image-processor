@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk
 
-from util import max_rect_2, get_window_size, get_window_rect, try_pack_forget
+from util import *
 
 class ImageDisplayFrame:
     def __init__(self, parent):
@@ -79,7 +79,8 @@ class ImageDisplayFrame:
         self.update_size()
         self.imagetk = ImageTk.PhotoImage(self.im)
         self.image_label.config(image = self.imagetk)
-        self.px = im.load()
+        self.canonical_im = canonical_mode(self.im)
+        self.px = self.canonical_im.load()
 
     def on_resize_canvas(self, event):
         self.update_size()
@@ -88,7 +89,7 @@ class ImageDisplayFrame:
         self.cursor_pos = (event.x, event.y)
 
     @property
-    def cursor_rgb(self):
+    def cursor_value(self):
         try:
             return self.px[self.cursor_pos]
         except:
