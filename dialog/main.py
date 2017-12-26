@@ -143,7 +143,8 @@ class MainDialog:
             self.status_bar.config(text = i18n['status_bar_text_short'] % (show_image_mode(self.im)))
 
     def open_file(self, event = None):
-        filepath = filedialog.askopenfilename(initialdir = self.recent_dir, filetypes = allowed_filetypes)
+        filepath = filedialog.askopenfilename(title = i18n['open'], initialdir = self.recent_dir,
+            filetypes = allowed_filetypes)
         if not filepath:
             return
 
@@ -180,7 +181,7 @@ class MainDialog:
             return
 
         current_dir, current_filename = os.path.split(self.current_file)
-        filepath = filedialog.asksaveasfilename(initialdir = current_dir,
+        filepath = filedialog.asksaveasfilename(title = i18n['save_as'], initialdir = current_dir,
             initialfile = current_filename, filetypes = allowed_filetypes)
         if not filepath:
             return
@@ -231,6 +232,11 @@ class MainDialog:
             self.update_status_bar()
 
     def on_close(self, event = None):
+        if self.im and self.version.unsaved:
+            message_prompt = i18n['unsaved_exit_prompt'] % (native_path_format(self.current_file))
+            if not messagebox.askyesno(i18n['exit'], message_prompt, default = messagebox.NO):
+                return
+
         self.window.quit()
 
     def __call__(self):

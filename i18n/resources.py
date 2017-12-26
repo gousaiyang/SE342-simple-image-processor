@@ -37,7 +37,8 @@ en_resources = {
     'binary': 'Binary',
     'ready': 'Ready',
     'status_bar_text': 'Mode: %s  Position: (%d, %d)  Value: %s',
-    'status_bar_text_short': 'Mode: %s'
+    'status_bar_text_short': 'Mode: %s',
+    'unsaved_exit_prompt': 'Discard changes to file "%s" and exit?'
 }
 
 zh_CN_resources = {
@@ -77,5 +78,6 @@ zh_CN_resources = {
     'binary': '二值',
     'ready': '就绪',
     'status_bar_text': '模式：%s  坐标：(%d, %d)  值：%s',
-    'status_bar_text_short': '模式：%s'
+    'status_bar_text_short': '模式：%s',
+    'unsaved_exit_prompt': '放弃对文件 "%s" 的修改并退出？'
 }
