@@ -6,6 +6,10 @@ from util import *
 from i18n import i18n
 
 @check_image_mode(ImageMode.COLOR)
+def check_color_image(im):
+    pass
+
+@check_image_mode(ImageMode.COLOR)
 def get_band(im, band):
     bd = band.lower()
     if bd not in ['r', 'g', 'b']:

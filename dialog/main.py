@@ -13,6 +13,7 @@ from util import *
 from i18n import i18n
 from .image_display import ImageDisplayFrame
 from .hsl_adjust import HSLAdjustDialog
+from .threshold_adjust import ThresholdAdjustDialog
 
 allowed_filetypes = [(i18n['image_files'], '*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tiff;*.webp'), (i18n['all_files'], '*.*')]
 
@@ -112,6 +113,7 @@ class MainDialog:
         self.binarization_menu = tk.Menu(self.transformation_menu, tearoff = False)
         self.transformation_menu.add_cascade(label = i18n['binarization'], menu = self.binarization_menu)
         self.binarization_menu.add_command(label = i18n['otsu'], command = self.otsu)
+        self.binarization_menu.add_command(label = i18n['manual_two_thresholds'], command = self.two_thresholds)
 
         self.detection_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['detection'], menu = self.detection_menu)
@@ -236,6 +238,7 @@ class MainDialog:
 
     @transform_method
     def HSL_adjust(self, event = None):
+        transformation.check_color_image(self.im)
         had = HSLAdjustDialog(self)
         had()
         if had.apply:
@@ -244,6 +247,14 @@ class MainDialog:
     @transform_method
     def otsu(self, event = None):
         self.version.add(transformation.otsu(self.im))
+
+    @transform_method
+    def two_thresholds(self, event = None):
+        transformation.check_grayscale_image(self.im)
+        tad = ThresholdAdjustDialog(self)
+        tad()
+        if tad.apply:
+            self.version.add(self.im)
 
     def on_close(self, event = None):
         if self.im and self.version.unsaved:

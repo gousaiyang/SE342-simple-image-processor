@@ -5,6 +5,10 @@ from PIL import Image
 from util import *
 
 @check_image_mode(ImageMode.GRAYSCALE)
+def check_grayscale_image(im):
+    pass
+
+@check_image_mode(ImageMode.GRAYSCALE)
 def grayscale_histogram(im):
     histogram = [0] * 256
     px = canonical_mode(im).load()
@@ -56,5 +60,23 @@ def otsu(im):
     for x in range(im.size[0]):
         for y in range(im.size[1]):
             new_px[x, y] = 255 if px[x, y] >= threshold else 0
+
+    return new_im
+
+@check_image_mode(ImageMode.GRAYSCALE)
+def two_thresholds(im, th1, th2):
+    assert isinstance(th1, int)
+    assert isinstance(th2, int)
+    assert th1 >= 0 and th1 <= 256
+    assert th2 >= 0 and th2 <= 256
+
+    new_im = Image.new('1', im.size)
+    new_px = new_im.load()
+    px = canonical_mode(im).load()
+
+    for x in range(im.size[0]):
+        for y in range(im.size[1]):
+            v = px[x, y]
+            new_px[x, y] = 255 if v >= th1 and v < th2 else 0
 
     return new_im
