@@ -33,6 +33,17 @@ def canonical_mode(im):
         raise TypeError(i18n['invalid_image'])
         return None
 
+def canonical_mode_name(mode):
+    if mode == ImageMode.COLOR:
+        return 'RGB'
+    elif mode == ImageMode.GRAYSCALE:
+        return 'L'
+    elif mode == ImageMode.BINARY:
+        return '1'
+    else:
+        raise TypeError(i18n['invalid_image'])
+        return None
+
 def check_image_mode(mode):
     def decorator(func):
         @functools.wraps(func)
@@ -47,3 +58,20 @@ def check_image_mode(mode):
             return func(im, *args, **kw)
         return wrapper
     return decorator
+
+def check_image_mode_2(func):
+    @functools.wraps(func)
+    def wrapper(im1, im2, *args, **kw):
+        if get_image_mode(im1) != get_image_mode(im2):
+            raise TypeError(i18n['select_image_mismatch'])
+        return func(im1, im2, *args, **kw)
+    return wrapper
+
+def point_in_image(point, size):
+    return point[0] < size[0] and point[1] < size[1]
+
+def get_px_wrapper(px, size, point):
+    return px[point] if point_in_image(point, size) else 0
+
+def get_px_wrapper_rgb(px, size, point):
+    return px[point] if point_in_image(point, size) else (0, 0, 0)

@@ -114,6 +114,11 @@ class MainDialog:
         self.transformation_menu.add_cascade(label = i18n['binarization'], menu = self.binarization_menu)
         self.binarization_menu.add_command(label = i18n['otsu'], command = self.otsu)
         self.binarization_menu.add_command(label = i18n['manual_two_thresholds'], command = self.two_thresholds)
+        self.arith_geo_menu = tk.Menu(self.transformation_menu, tearoff = False)
+        self.transformation_menu.add_cascade(label = i18n['arith_geo'], menu = self.arith_geo_menu)
+        self.arith_geo_menu.add_command(label = i18n['addition'], command = self.addition)
+        self.arith_geo_menu.add_command(label = i18n['subtraction'], command = self.subtraction)
+        self.arith_geo_menu.add_command(label = i18n['multiplication'], command = self.multiplication)
 
         self.detection_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['detection'], menu = self.detection_menu)
@@ -255,6 +260,54 @@ class MainDialog:
         tad()
         if tad.apply:
             self.version.add(self.im)
+
+    @transform_method
+    def addition(self, event = None):
+        filepath = filedialog.askopenfilename(title = i18n['select_another_image'], initialdir = self.recent_dir,
+            filetypes = allowed_filetypes)
+        if not filepath:
+            return
+
+        try:
+            im = Image.open(filepath)
+            assert get_image_mode(im) != ImageMode.INVALID
+        except:
+            logger.exception(i18n['invalid_image'])
+            messagebox.showerror(i18n['open_failed'], i18n['invalid_image'])
+        else:
+            self.version.add(transformation.image_addition(self.im, im))
+
+    @transform_method
+    def subtraction(self, event = None):
+        filepath = filedialog.askopenfilename(title = i18n['select_another_image'], initialdir = self.recent_dir,
+            filetypes = allowed_filetypes)
+        if not filepath:
+            return
+
+        try:
+            im = Image.open(filepath)
+            assert get_image_mode(im) != ImageMode.INVALID
+        except:
+            logger.exception(i18n['invalid_image'])
+            messagebox.showerror(i18n['open_failed'], i18n['invalid_image'])
+        else:
+            self.version.add(transformation.image_subtraction(self.im, im))
+
+    @transform_method
+    def multiplication(self, event = None):
+        filepath = filedialog.askopenfilename(title = i18n['select_another_image'], initialdir = self.recent_dir,
+            filetypes = allowed_filetypes)
+        if not filepath:
+            return
+
+        try:
+            im = Image.open(filepath)
+            assert get_image_mode(im) != ImageMode.INVALID
+        except:
+            logger.exception(i18n['invalid_image'])
+            messagebox.showerror(i18n['open_failed'], i18n['invalid_image'])
+        else:
+            self.version.add(transformation.image_multiplication(self.im, im))
 
     def on_close(self, event = None):
         if self.im and self.version.unsaved:
