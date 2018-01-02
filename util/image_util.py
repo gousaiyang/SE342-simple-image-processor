@@ -68,10 +68,13 @@ def check_image_mode_2(func):
     return wrapper
 
 def point_in_image(point, size):
-    return point[0] < size[0] and point[1] < size[1]
+    return point[0] >= 0 and point[0] < size[0] and point[1] >= 0 and point[1] < size[1]
 
 def get_px_wrapper(px, size, point):
     return px[point] if point_in_image(point, size) else 0
 
 def get_px_wrapper_rgb(px, size, point):
     return px[point] if point_in_image(point, size) else (0, 0, 0)
+
+def get_px_wrapper_rgba(px, size, point):
+    return px[point] + (255,) if point_in_image(point, size) else (0, 0, 0, 0)

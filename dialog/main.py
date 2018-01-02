@@ -15,6 +15,7 @@ from .image_display import ImageDisplayFrame
 from .hsl_adjust import HSLAdjustDialog
 from .threshold_adjust import ThresholdAdjustDialog
 from .scaling import ScalingDialog
+from .rotation import RotationDialog
 
 allowed_filetypes = [(i18n['image_files'], '*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tiff;*.webp'), (i18n['all_files'], '*.*')]
 
@@ -125,6 +126,10 @@ class MainDialog:
         self.arith_geo_menu.add_cascade(label = i18n['scaling'], menu = self.scaling_menu)
         self.scaling_menu.add_command(label = i18n['nearest'], command = self.scaling_nearest)
         self.scaling_menu.add_command(label = i18n['bilinear'], command = self.scaling_bilinear)
+        self.rotation_menu = tk.Menu(self.arith_geo_menu, tearoff = False)
+        self.arith_geo_menu.add_cascade(label = i18n['rotation'], menu = self.rotation_menu)
+        self.rotation_menu.add_command(label = i18n['nearest'], command = self.rotation_nearest)
+        self.rotation_menu.add_command(label = i18n['bilinear'], command = self.rotation_bilinear)
 
         self.detection_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['detection'], menu = self.detection_menu)
@@ -327,6 +332,20 @@ class MainDialog:
         sd = ScalingDialog(self, transformation.scaling_bilinear, i18n['bilinear'])
         sd()
         if sd.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def rotation_nearest(self, event = None):
+        rd = RotationDialog(self, transformation.rotation_nearest, i18n['nearest'])
+        rd()
+        if rd.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def rotation_bilinear(self, event = None):
+        rd = RotationDialog(self, transformation.rotation_bilinear, i18n['bilinear'])
+        rd()
+        if rd.apply:
             self.version.add(self.im)
 
     def on_close(self, event = None):
