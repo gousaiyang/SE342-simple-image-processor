@@ -109,6 +109,9 @@ class MainDialog:
         self.split_rgb_menu.add_command(label = i18n['B'], command = functools.partial(self.split_rgb, band = 'B'))
         self.color_image_processing_menu.add_command(label = i18n['color2grayscale'], command = self.color2grayscale)
         self.color_image_processing_menu.add_command(label = i18n['HSL_adjusting'], command = self.HSL_adjust)
+        self.binarization_menu = tk.Menu(self.transformation_menu, tearoff = False)
+        self.transformation_menu.add_cascade(label = i18n['binarization'], menu = self.binarization_menu)
+        self.binarization_menu.add_command(label = i18n['otsu'], command = self.otsu)
 
         self.detection_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['detection'], menu = self.detection_menu)
@@ -237,6 +240,10 @@ class MainDialog:
         had()
         if had.apply:
             self.version.add(self.im)
+
+    @transform_method
+    def otsu(self, event = None):
+        self.version.add(transformation.otsu(self.im))
 
     def on_close(self, event = None):
         if self.im and self.version.unsaved:

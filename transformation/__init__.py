@@ -1,1 +1,2 @@
-from .color_image_processing import *
+from .color_image import *
+from .grayscale_image import *

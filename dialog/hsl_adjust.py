@@ -38,7 +38,7 @@ class HSLAdjustDialog:
         self.window.grab_set()
 
     def init_coords(self):
-        self.x1 = 20
+        self.x1 = 10
         self.x2 = 80
         self.x3 = 285
         self.bottom_x1 = 77
