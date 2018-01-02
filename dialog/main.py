@@ -14,6 +14,7 @@ from i18n import i18n
 from .image_display import ImageDisplayFrame
 from .hsl_adjust import HSLAdjustDialog
 from .threshold_adjust import ThresholdAdjustDialog
+from .scaling import ScalingDialog
 
 allowed_filetypes = [(i18n['image_files'], '*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tiff;*.webp'), (i18n['all_files'], '*.*')]
 
@@ -119,6 +120,11 @@ class MainDialog:
         self.arith_geo_menu.add_command(label = i18n['addition'], command = self.addition)
         self.arith_geo_menu.add_command(label = i18n['subtraction'], command = self.subtraction)
         self.arith_geo_menu.add_command(label = i18n['multiplication'], command = self.multiplication)
+        ### TODO: add cropping
+        self.scaling_menu = tk.Menu(self.arith_geo_menu, tearoff = False)
+        self.arith_geo_menu.add_cascade(label = i18n['scaling'], menu = self.scaling_menu)
+        self.scaling_menu.add_command(label = i18n['nearest'], command = self.scaling_nearest)
+        self.scaling_menu.add_command(label = i18n['bilinear'], command = self.scaling_bilinear)
 
         self.detection_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['detection'], menu = self.detection_menu)
@@ -308,6 +314,20 @@ class MainDialog:
             messagebox.showerror(i18n['open_failed'], i18n['invalid_image'])
         else:
             self.version.add(transformation.image_multiplication(self.im, im))
+
+    @transform_method
+    def scaling_nearest(self, event = None):
+        sd = ScalingDialog(self, transformation.scaling_nearest, i18n['nearest'])
+        sd()
+        if sd.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def scaling_bilinear(self, event = None):
+        sd = ScalingDialog(self, transformation.scaling_bilinear, i18n['bilinear'])
+        sd()
+        if sd.apply:
+            self.version.add(self.im)
 
     def on_close(self, event = None):
         if self.im and self.version.unsaved:
