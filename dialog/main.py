@@ -12,6 +12,7 @@ import transformation
 from util import *
 from i18n import i18n
 from .image_display import ImageDisplayFrame
+from .hsl_adjust import HSLAdjustDialog
 
 allowed_filetypes = [(i18n['image_files'], '*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tiff;*.webp'), (i18n['all_files'], '*.*')]
 
@@ -35,7 +36,7 @@ def transform_method(func):
             r = func(self, *args, **kw)
         except Exception as e:
             logger.exception(e)
-            messagebox.showwarning(i18n['error'], e)
+            messagebox.showwarning(i18n['error'], str(e) or i18n['unknown_error'])
         else:
             self.im = self.version.current_version
             self.update_title()
@@ -107,6 +108,7 @@ class MainDialog:
         self.split_rgb_menu.add_command(label = i18n['G'], command = functools.partial(self.split_rgb, band = 'G'))
         self.split_rgb_menu.add_command(label = i18n['B'], command = functools.partial(self.split_rgb, band = 'B'))
         self.color_image_processing_menu.add_command(label = i18n['color2grayscale'], command = self.color2grayscale)
+        self.color_image_processing_menu.add_command(label = i18n['HSL_adjusting'], command = self.HSL_adjust)
 
         self.detection_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['detection'], menu = self.detection_menu)
@@ -228,6 +230,13 @@ class MainDialog:
     @transform_method
     def color2grayscale(self, event = None):
         self.version.add(transformation.color2grayscale(self.im))
+
+    @transform_method
+    def HSL_adjust(self, event = None):
+        had = HSLAdjustDialog(self)
+        had()
+        if had.apply:
+            self.version.add(self.im)
 
     def on_close(self, event = None):
         if self.im and self.version.unsaved:
