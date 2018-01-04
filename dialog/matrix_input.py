@@ -3,6 +3,7 @@
 import re
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 
 from util import *
 from i18n import i18n
@@ -70,7 +71,11 @@ class MatrixInputDialog:
         self.cancel_button.place(x = self.bottom_x2, y = self.bottom_y)
 
     def update_image_show(self):
-        self.parent.im = self.transform_func(self.old_im, self.matrix)
+        try:
+            self.parent.im = self.transform_func(self.old_im, self.matrix)
+        except Exception as e:
+            logger.exception(e)
+            messagebox.showwarning(i18n['error'], str(e) or i18n['unknown_error'])
 
     def on_matrix_entry_change(self, event = None):
         try:

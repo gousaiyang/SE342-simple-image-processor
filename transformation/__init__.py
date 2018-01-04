@@ -4,3 +4,4 @@ from .arithmetic import *
 from .geometric import *
 from .contrast import *
 from .filter import *
+from .morph import *

@@ -149,6 +149,18 @@ class MainDialog:
         self.filter_menu.add_command(label = i18n['median'], command = self.median_filter)
         self.filter_menu.add_command(label = i18n['gaussian'], command = self.gaussian_filter)
         self.filter_menu.add_command(label = i18n['custom_filter'], command = self.custom_filter)
+        self.binary_morph_menu = tk.Menu(self.transformation_menu, tearoff = False)
+        self.transformation_menu.add_cascade(label = i18n['binary_morphology'], menu = self.binary_morph_menu)
+        self.binary_morph_menu.add_command(label = i18n['dilation'], command = self.binary_dilation)
+        self.binary_morph_menu.add_command(label = i18n['erosion'], command = self.binary_erosion)
+        self.binary_morph_menu.add_command(label = i18n['opening'], command = self.binary_opening)
+        self.binary_morph_menu.add_command(label = i18n['closing'], command = self.binary_closing)
+        self.binary_morph_menu.add_command(label = i18n['thinning'], command = self.binary_thinning)
+        self.binary_morph_menu.add_command(label = i18n['thickening'], command = self.binary_thickening)
+        self.binary_morph_menu.add_command(label = i18n['distance_transform'], command = self.binary_distance_transform)
+        self.binary_morph_menu.add_command(label = i18n['skeletonization'], command = self.binary_skeletonization)
+        self.binary_morph_menu.add_command(label = i18n['skeleton_reconstruct'], command = self.binary_skeleton_reconstruct)
+        self.binary_morph_menu.add_command(label = i18n['morph_reconstruct'], command = self.binary_morph_reconstruct)
 
         self.detection_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['detection'], menu = self.detection_menu)
@@ -432,6 +444,101 @@ class MainDialog:
         mid()
         if mid.apply:
             self.version.add(self.im)
+
+    @transform_method
+    def binary_dilation(self, event = None):
+        transformation.check_binary_image(self.im)
+        mid = MatrixInputDialog(self, i18n['dilation'], i18n['se'], transformation.binary_se_example,
+            transformation.binary_dilation)
+        mid()
+        if mid.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def binary_erosion(self, event = None):
+        transformation.check_binary_image(self.im)
+        mid = MatrixInputDialog(self, i18n['erosion'], i18n['se'], transformation.binary_se_example,
+            transformation.binary_erosion)
+        mid()
+        if mid.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def binary_opening(self, event = None):
+        transformation.check_binary_image(self.im)
+        mid = MatrixInputDialog(self, i18n['opening'], i18n['se'], transformation.binary_se_example,
+            transformation.binary_opening)
+        mid()
+        if mid.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def binary_closing(self, event = None):
+        transformation.check_binary_image(self.im)
+        mid = MatrixInputDialog(self, i18n['closing'], i18n['se'], transformation.binary_se_example,
+            transformation.binary_closing)
+        mid()
+        if mid.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def binary_thinning(self, event = None):
+        transformation.check_binary_image(self.im)
+        mid = MatrixInputDialog(self, i18n['thinning'], i18n['se'], transformation.binary_thinning_se_example,
+            transformation.binary_thinning)
+        mid()
+        if mid.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def binary_thickening(self, event = None):
+        transformation.check_binary_image(self.im)
+        mid = MatrixInputDialog(self, i18n['thickening'], i18n['se'], transformation.binary_thickening_se_example,
+            transformation.binary_thickening)
+        mid()
+        if mid.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def binary_distance_transform(self, event = None):
+        self.version.add(transformation.binary_distance_transform(self.im))
+
+    @transform_method
+    def binary_skeletonization(self, event = None):
+        transformation.check_binary_image(self.im)
+        mid = MatrixInputDialog(self, i18n['skeletonization'], i18n['se'], transformation.binary_simple_se_example,
+            transformation.binary_skeletonization)
+        mid()
+        if mid.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def binary_skeleton_reconstruct(self, event = None):
+        reconstruct_im = transformation.binary_skeleton_reconstruct()
+        if transformation.binary_skeleton_done():
+            self.version.add(reconstruct_im)
+
+    @transform_method
+    def binary_morph_reconstruct(self, event = None):
+        filepath = filedialog.askopenfilename(title = i18n['select_template_image'], initialdir = self.recent_dir,
+            filetypes = allowed_filetypes)
+        if not filepath:
+            return
+
+        try:
+            im = Image.open(filepath)
+            assert get_image_mode(im) != ImageMode.INVALID
+        except:
+            logger.exception(i18n['invalid_image'])
+            messagebox.showerror(i18n['open_failed'], i18n['invalid_image'])
+        else:
+            transformation.check_binary_image(self.im)
+            transformation.check_binary_image(im)
+            mid = MatrixInputDialog(self, i18n['morph_reconstruct'], i18n['se'], transformation.binary_simple_se_example,
+                functools.partial(transformation.binary_morph_reconstruct, im))
+            mid()
+            if mid.apply:
+                self.version.add(self.im)
 
     def on_close(self, event = None):
         if self.im and self.version.unsaved:
