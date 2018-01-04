@@ -19,6 +19,15 @@ def grayscale_histogram(im):
 
     return histogram
 
+def cumulative_histogram(histogram):
+    ch = [0] * 256
+    ch[0] = histogram[0]
+
+    for i in range(1, 256):
+        ch[i] = ch[i - 1] + histogram[i]
+
+    return ch
+
 @check_image_mode(ImageMode.GRAYSCALE)
 def otsu(im):
     new_im = Image.new('1', im.size)
@@ -78,5 +87,28 @@ def two_thresholds(im, th1, th2):
         for y in range(im.size[1]):
             v = px[x, y]
             new_px[x, y] = 255 if v >= th1 and v < th2 else 0
+
+    return new_im
+
+@check_image_mode(ImageMode.GRAYSCALE)
+def histogram_equalization(im):
+    imsize = im.size[0] * im.size[1]
+
+    new_im = Image.new('L', im.size)
+    new_px = new_im.load()
+    px = canonical_mode(im).load()
+
+    histogram = grayscale_histogram(im)
+    ch = cumulative_histogram(histogram)
+    chmin = 0
+
+    for i in range(256):
+        if ch[i] != 0:
+            chmin = i
+            break
+
+    for x in range(im.size[0]):
+        for y in range(im.size[1]):
+            new_px[x, y] = round((ch[px[x, y]] - chmin) / (imsize - chmin) * 255)
 
     return new_im

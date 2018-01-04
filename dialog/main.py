@@ -2,11 +2,13 @@
 
 import os
 import functools
+import numpy as np
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 from PIL import Image
+from matplotlib import pyplot as plt
 
 import transformation
 from util import *
@@ -16,6 +18,7 @@ from .hsl_adjust import HSLAdjustDialog
 from .threshold_adjust import ThresholdAdjustDialog
 from .scaling import ScalingDialog
 from .rotation import RotationDialog
+from .contrast_adjust import ContrastDialog
 
 allowed_filetypes = [(i18n['image_files'], '*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tiff;*.webp'), (i18n['all_files'], '*.*')]
 
@@ -130,6 +133,14 @@ class MainDialog:
         self.arith_geo_menu.add_cascade(label = i18n['rotation'], menu = self.rotation_menu)
         self.rotation_menu.add_command(label = i18n['nearest'], command = self.rotation_nearest)
         self.rotation_menu.add_command(label = i18n['bilinear'], command = self.rotation_bilinear)
+        self.contrast_menu = tk.Menu(self.transformation_menu, tearoff = False)
+        self.transformation_menu.add_cascade(label = i18n['contrast_adjust'], menu = self.contrast_menu)
+        self.contrast_menu.add_command(label = i18n['linear'], command = self.contrast_linear)
+        self.contrast_menu.add_command(label = i18n['piecewise_linear'], command = self.contrast_piecewise)
+        self.contrast_menu.add_command(label = i18n['logarithmic'], command = self.contrast_logarithmic)
+        self.contrast_menu.add_command(label = i18n['exponential'], command = self.contrast_exponential)
+        self.contrast_menu.add_command(label = i18n['histogram_display'], command = self.histogram_display)
+        self.contrast_menu.add_command(label = i18n['histogram_equalization'], command = self.histogram_equalization)
 
         self.detection_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['detection'], menu = self.detection_menu)
@@ -347,6 +358,49 @@ class MainDialog:
         rd()
         if rd.apply:
             self.version.add(self.im)
+
+    @transform_method
+    def contrast_linear(self, event = None):
+        cd = ContrastDialog(self, transformation.ContrastMode.LINEAR, i18n['linear'])
+        cd()
+        if cd.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def contrast_piecewise(self, event = None):
+        cd = ContrastDialog(self, transformation.ContrastMode.PIECEWISE_LINEAR, i18n['piecewise_linear'])
+        cd()
+        if cd.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def contrast_logarithmic(self, event = None):
+        cd = ContrastDialog(self, transformation.ContrastMode.LOGARITHMIC, i18n['logarithmic'])
+        cd()
+        if cd.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def contrast_exponential(self, event = None):
+        cd = ContrastDialog(self, transformation.ContrastMode.EXPONENTIAL, i18n['exponential'])
+        cd()
+        if cd.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def histogram_display(self, event = None):
+        index = np.arange(256)
+        plt.figure().canvas.set_window_title(i18n['histogram_display'])
+        plt.rcParams['font.sans-serif'] = ['SimHei']
+        plt.bar(index, transformation.grayscale_histogram(self.im))
+        plt.title(i18n['histogram_display'])
+        plt.xlabel(i18n['grayscale_value'])
+        plt.ylabel(i18n['count'])
+        plt.show()
+
+    @transform_method
+    def histogram_equalization(self, event = None):
+        self.version.add(transformation.histogram_equalization(self.im))
 
     def on_close(self, event = None):
         if self.im and self.version.unsaved:
