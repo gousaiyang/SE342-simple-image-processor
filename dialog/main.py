@@ -19,6 +19,8 @@ from .threshold_adjust import ThresholdAdjustDialog
 from .scaling import ScalingDialog
 from .rotation import RotationDialog
 from .contrast_adjust import ContrastDialog
+from .gaussian_filter import GaussianFilterDialog
+from .matrix_input import MatrixInputDialog
 
 allowed_filetypes = [(i18n['image_files'], '*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tiff;*.webp'), (i18n['all_files'], '*.*')]
 
@@ -141,6 +143,12 @@ class MainDialog:
         self.contrast_menu.add_command(label = i18n['exponential'], command = self.contrast_exponential)
         self.contrast_menu.add_command(label = i18n['histogram_display'], command = self.histogram_display)
         self.contrast_menu.add_command(label = i18n['histogram_equalization'], command = self.histogram_equalization)
+        self.filter_menu = tk.Menu(self.transformation_menu, tearoff = False)
+        self.transformation_menu.add_cascade(label = i18n['smooth_filter'], menu = self.filter_menu)
+        self.filter_menu.add_command(label = i18n['average'], command = self.average_filter)
+        self.filter_menu.add_command(label = i18n['median'], command = self.median_filter)
+        self.filter_menu.add_command(label = i18n['gaussian'], command = self.gaussian_filter)
+        self.filter_menu.add_command(label = i18n['custom_filter'], command = self.custom_filter)
 
         self.detection_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['detection'], menu = self.detection_menu)
@@ -401,6 +409,29 @@ class MainDialog:
     @transform_method
     def histogram_equalization(self, event = None):
         self.version.add(transformation.histogram_equalization(self.im))
+
+    @transform_method
+    def average_filter(self, event = None):
+        self.version.add(transformation.average_filter(self.im))
+
+    @transform_method
+    def median_filter(self, event = None):
+        self.version.add(transformation.median_filter(self.im))
+
+    @transform_method
+    def gaussian_filter(self, event = None):
+        gfd = GaussianFilterDialog(self)
+        gfd()
+        if gfd.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def custom_filter(self, event = None):
+        mid = MatrixInputDialog(self, i18n['custom_filter'], i18n['kernel'], transformation.sharpen_filter_kernel,
+            transformation.smooth_filter)
+        mid()
+        if mid.apply:
+            self.version.add(self.im)
 
     def on_close(self, event = None):
         if self.im and self.version.unsaved:
