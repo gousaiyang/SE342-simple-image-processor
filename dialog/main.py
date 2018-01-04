@@ -160,7 +160,24 @@ class MainDialog:
         self.binary_morph_menu.add_command(label = i18n['distance_transform'], command = self.binary_distance_transform)
         self.binary_morph_menu.add_command(label = i18n['skeletonization'], command = self.binary_skeletonization)
         self.binary_morph_menu.add_command(label = i18n['skeleton_reconstruct'], command = self.binary_skeleton_reconstruct)
-        self.binary_morph_menu.add_command(label = i18n['morph_reconstruct'], command = self.binary_morph_reconstruct)
+        self.binary_morph_recon_menu = tk.Menu(self.transformation_menu, tearoff = False)
+        self.binary_morph_menu.add_cascade(label = i18n['morph_reconstruct'], menu = self.binary_morph_recon_menu)
+        self.binary_morph_recon_menu.add_command(label = i18n['dilation'],
+            command = functools.partial(self.binary_morph_reconstruct, dilation = True))
+        self.binary_morph_recon_menu.add_command(label = i18n['erosion'],
+            command = functools.partial(self.binary_morph_reconstruct, dilation = False))
+        self.grayscale_morph_menu = tk.Menu(self.transformation_menu, tearoff = False)
+        self.transformation_menu.add_cascade(label = i18n['grayscale_morphology'], menu = self.grayscale_morph_menu)
+        self.grayscale_morph_menu.add_command(label = i18n['dilation'], command = self.grayscale_dilation)
+        self.grayscale_morph_menu.add_command(label = i18n['erosion'], command = self.grayscale_erosion)
+        self.grayscale_morph_menu.add_command(label = i18n['opening'], command = self.grayscale_opening)
+        self.grayscale_morph_menu.add_command(label = i18n['closing'], command = self.grayscale_closing)
+        self.grayscale_morph_recon_menu = tk.Menu(self.transformation_menu, tearoff = False)
+        self.grayscale_morph_menu.add_cascade(label = i18n['morph_reconstruct'], menu = self.grayscale_morph_recon_menu)
+        self.grayscale_morph_recon_menu.add_command(label = i18n['dilation'],
+            command = functools.partial(self.grayscale_morph_reconstruct, dilation = True))
+        self.grayscale_morph_recon_menu.add_command(label = i18n['erosion'],
+            command = functools.partial(self.grayscale_morph_reconstruct, dilation = False))
 
         self.detection_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['detection'], menu = self.detection_menu)
@@ -519,7 +536,7 @@ class MainDialog:
             self.version.add(reconstruct_im)
 
     @transform_method
-    def binary_morph_reconstruct(self, event = None):
+    def binary_morph_reconstruct(self, event = None, *, dilation):
         filepath = filedialog.askopenfilename(title = i18n['select_template_image'], initialdir = self.recent_dir,
             filetypes = allowed_filetypes)
         if not filepath:
@@ -535,7 +552,65 @@ class MainDialog:
             transformation.check_binary_image(self.im)
             transformation.check_binary_image(im)
             mid = MatrixInputDialog(self, i18n['morph_reconstruct'], i18n['se'], transformation.binary_simple_se_example,
-                functools.partial(transformation.binary_morph_reconstruct, im))
+                functools.partial(transformation.binary_morph_reconstruct, im, dilation = dilation))
+            mid()
+            if mid.apply:
+                self.version.add(self.im)
+
+    @transform_method
+    def grayscale_dilation(self, event = None):
+        transformation.check_grayscale_image(self.im)
+        mid = MatrixInputDialog(self, i18n['dilation'], i18n['se'], transformation.grayscale_se_example,
+            transformation.grayscale_dilation)
+        mid()
+        if mid.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def grayscale_erosion(self, event = None):
+        transformation.check_grayscale_image(self.im)
+        mid = MatrixInputDialog(self, i18n['erosion'], i18n['se'], transformation.grayscale_se_example,
+            transformation.grayscale_erosion)
+        mid()
+        if mid.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def grayscale_opening(self, event = None):
+        transformation.check_grayscale_image(self.im)
+        mid = MatrixInputDialog(self, i18n['opening'], i18n['se'], transformation.grayscale_se_example,
+            transformation.grayscale_opening)
+        mid()
+        if mid.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def grayscale_closing(self, event = None):
+        transformation.check_grayscale_image(self.im)
+        mid = MatrixInputDialog(self, i18n['closing'], i18n['se'], transformation.grayscale_se_example,
+            transformation.grayscale_closing)
+        mid()
+        if mid.apply:
+            self.version.add(self.im)
+
+    @transform_method
+    def grayscale_morph_reconstruct(self, event = None, *, dilation):
+        filepath = filedialog.askopenfilename(title = i18n['select_template_image'], initialdir = self.recent_dir,
+            filetypes = allowed_filetypes)
+        if not filepath:
+            return
+
+        try:
+            im = Image.open(filepath)
+            assert get_image_mode(im) != ImageMode.INVALID
+        except:
+            logger.exception(i18n['invalid_image'])
+            messagebox.showerror(i18n['open_failed'], i18n['invalid_image'])
+        else:
+            transformation.check_grayscale_image(self.im)
+            transformation.check_grayscale_image(im)
+            mid = MatrixInputDialog(self, i18n['morph_reconstruct'], i18n['se'], transformation.grayscale_se_example,
+                functools.partial(transformation.grayscale_morph_reconstruct, im, dilation = dilation))
             mid()
             if mid.apply:
                 self.version.add(self.im)

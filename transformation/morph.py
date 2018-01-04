@@ -34,6 +34,30 @@ def check_binary_se(se):
 
     return bool(a % 2) and b is not None and bool(b % 2)
 
+def check_grayscale_se(se):
+    if not isinstance(se, list):
+        return False
+
+    a = len(se)
+    b = None
+
+    for item in se:
+        if not isinstance(item, list):
+            return False
+
+        l = len(item)
+
+        if b is None:
+            b = l
+        elif b != l:
+            return False
+
+        for subitem in item:
+            if subitem not in range(256):
+                return False
+
+    return bool(a % 2) and b is not None and bool(b % 2)
+
 def get_se_center(se):
     return (len(se) // 2, len(se[0]) // 2)
 
@@ -262,7 +286,7 @@ def binary_equal(im1, im2):
 
     return True
 
-def binary_morph_reconstruct(img, imf, se):
+def binary_morph_reconstruct(img, imf, se, *, dilation):
     if get_image_mode(imf) != ImageMode.BINARY:
         raise TypeError(i18n['some_image_mode_expected'] % i18n['binary'])
     if get_image_mode(img) != ImageMode.BINARY:
@@ -274,7 +298,123 @@ def binary_morph_reconstruct(img, imf, se):
 
     while True:
         imd_old = imd
-        imd = image_multiplication(binary_dilation(imd, se), img)
+        if dilation:
+            imd = image_multiplication(binary_dilation(imd, se), img)
+        else:
+            imd = image_addition(binary_erosion(imd, se), img)
+        if binary_equal(imd_old, imd):
+            break
+
+    return imd
+
+grayscale_se_example = [[10, 10, 10], [10, 10, 10], [10, 10, 10]]
+
+@check_image_mode(ImageMode.GRAYSCALE)
+def grayscale_dilation(im, se):
+    if not check_grayscale_se(se):
+        raise TypeError(i18n['invalid_se'])
+
+    scx, scy = get_se_center(se)
+
+    new_im = Image.new('L', im.size)
+    new_px = new_im.load()
+    px = canonical_mode(im).load()
+
+    for x in range(im.size[0]):
+        for y in range(im.size[1]):
+            max_v = 0
+
+            for i in range(-scx, scx + 1):
+                for j in range(-scy, scy + 1):
+                    v = min(se[scx + i][scy + j] + get_px_wrapper(px, im.size, (x - i, y - j)), 255)
+                    if v > max_v:
+                        max_v = v
+
+            new_px[x, y] = max_v
+
+    return new_im
+
+@check_image_mode(ImageMode.GRAYSCALE)
+def grayscale_erosion(im, se):
+    if not check_grayscale_se(se):
+        raise TypeError(i18n['invalid_se'])
+
+    scx, scy = get_se_center(se)
+
+    new_im = Image.new('L', im.size)
+    new_px = new_im.load()
+    px = canonical_mode(im).load()
+
+    for x in range(im.size[0]):
+        for y in range(im.size[1]):
+            min_v = 256
+
+            for i in range(-scx, scx + 1):
+                for j in range(-scy, scy + 1):
+                    v = max(get_px_wrapper(px, im.size, (x + i, y + j)) - se[scx + i][scy + j], 0)
+                    if v < min_v:
+                        min_v = v
+
+            new_px[x, y] = min_v
+
+    return new_im
+
+@check_image_mode(ImageMode.GRAYSCALE)
+def grayscale_opening(im, se):
+    return grayscale_dilation(grayscale_erosion(im, se), se)
+
+@check_image_mode(ImageMode.GRAYSCALE)
+def grayscale_closing(im, se):
+    return grayscale_erosion(grayscale_dilation(im, se), se)
+
+def grayscale_min(im1, im2):
+    new_width = min(im1.size[0], im2.size[0])
+    new_height = min(im1.size[1], im2.size[1])
+
+    new_im = Image.new('L', (new_width, new_height))
+    new_px = new_im.load()
+    px1 = canonical_mode(im1).load()
+    px2 = canonical_mode(im2).load()
+
+    for x in range(new_width):
+        for y in range(new_height):
+            new_px[x, y] = min(px1[x, y], px2[x, y])
+
+    return new_im
+
+def grayscale_max(im1, im2):
+    new_width = max(im1.size[0], im2.size[0])
+    new_height = max(im1.size[1], im2.size[1])
+
+    new_im = Image.new('L', (new_width, new_height))
+    new_px = new_im.load()
+    px1 = canonical_mode(im1).load()
+    px2 = canonical_mode(im2).load()
+
+    for x in range(new_width):
+        for y in range(new_height):
+            v1 = get_px_wrapper(px1, im1.size, (x, y))
+            v2 = get_px_wrapper(px2, im2.size, (x, y))
+            new_px[x, y] = max(v1, v2)
+
+    return new_im
+
+def grayscale_morph_reconstruct(img, imf, se, *, dilation):
+    if get_image_mode(imf) != ImageMode.GRAYSCALE:
+        raise TypeError(i18n['some_image_mode_expected'] % i18n['grayscale'])
+    if get_image_mode(img) != ImageMode.GRAYSCALE:
+        raise TypeError(i18n['some_image_mode_expected'] % i18n['grayscale'])
+    if not check_grayscale_se(se):
+        raise TypeError(i18n['invalid_se'])
+
+    imd = imf
+
+    while True:
+        imd_old = imd
+        if dilation:
+            imd = grayscale_min(grayscale_dilation(imd, se), img)
+        else:
+            imd = grayscale_max(grayscale_erosion(imd, se), img)
         if binary_equal(imd_old, imd):
             break
 
