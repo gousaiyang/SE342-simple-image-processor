@@ -16,6 +16,7 @@ from i18n import i18n
 from .image_display import ImageDisplayFrame
 from .hsl_adjust import HSLAdjustDialog
 from .threshold_adjust import ThresholdAdjustDialog
+from .crop import CropDialog
 from .scaling import ScalingDialog
 from .rotation import RotationDialog
 from .contrast_adjust import ContrastDialog
@@ -126,7 +127,8 @@ class MainDialog:
         self.arith_geo_menu.add_command(label = i18n['addition'], command = self.addition)
         self.arith_geo_menu.add_command(label = i18n['subtraction'], command = self.subtraction)
         self.arith_geo_menu.add_command(label = i18n['multiplication'], command = self.multiplication)
-        ### TODO: add cropping
+        self.arith_geo_menu.add_command(label = i18n['inverse'], command = self.inverse)
+        self.arith_geo_menu.add_command(label = i18n['crop'], command = self.crop)
         self.scaling_menu = tk.Menu(self.arith_geo_menu, tearoff = False)
         self.arith_geo_menu.add_cascade(label = i18n['scaling'], menu = self.scaling_menu)
         self.scaling_menu.add_command(label = i18n['nearest'], command = self.scaling_nearest)
@@ -220,12 +222,14 @@ class MainDialog:
             cursor_value = self.image_display.cursor_value
             image_mode = get_image_mode(self.im)
             if cursor_pos and cursor_value is not None:
-                self.status_bar.config(text = i18n['status_bar_text'] % (show_image_mode(self.im),
-                    cursor_pos[0], cursor_pos[1], show_pixel_value(cursor_value, image_mode)))
+                self.status_bar.config(text = i18n['status_bar_text'] % (self.im.size[0], self.im.size[1],
+                    show_image_mode(self.im), cursor_pos[0], cursor_pos[1], show_pixel_value(cursor_value, image_mode)))
             else:
-                self.status_bar.config(text = i18n['status_bar_text_short'] % (show_image_mode(self.im)))
+                self.status_bar.config(text = i18n['status_bar_text_short'] % (self.im.size[0], self.im.size[1],
+                    show_image_mode(self.im)))
         else:
-            self.status_bar.config(text = i18n['status_bar_text_short'] % (show_image_mode(self.im)))
+            self.status_bar.config(text = i18n['status_bar_text_short'] % (self.im.size[0], self.im.size[1],
+                show_image_mode(self.im)))
 
     def open_file(self, event = None):
         filepath = filedialog.askopenfilename(title = i18n['open'], initialdir = self.recent_dir,
@@ -367,6 +371,20 @@ class MainDialog:
             messagebox.showerror(i18n['open_failed'], i18n['invalid_image'])
         else:
             self.version.add(transformation.image_multiplication(self.im, im))
+
+    @transform_method
+    def inverse(self, event = None):
+        self.version.add(transformation.image_inverse(self.im))
+
+    @transform_method
+    def crop(self, event = None):
+        if self.im.size[0] == 0 or self.im.size[1] == 0:
+            return
+
+        cd = CropDialog(self)
+        cd()
+        if cd.apply:
+            self.version.add(self.im)
 
     @transform_method
     def scaling_nearest(self, event = None):

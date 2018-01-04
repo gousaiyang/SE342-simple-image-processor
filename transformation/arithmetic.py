@@ -76,3 +76,48 @@ def image_multiplication(im1, im2):
                 new_px[x, y] = min(round(v1 * v2 / 255), 255)
 
     return new_im
+
+def image_inverse(im):
+    mode = get_image_mode(im)
+    new_im = Image.new(canonical_mode_name(mode), im.size)
+    new_px = new_im.load()
+    px = canonical_mode(im).load()
+
+    for x in range(im.size[0]):
+        for y in range(im.size[1]):
+            if mode == ImageMode.COLOR:
+                r, g, b = px[x, y]
+                new_px[x, y] = (255 - r, 255 - g, 255 - b)
+            else:
+                new_px[x, y] = 255 - px[x, y]
+
+    return new_im
+
+def image_crop(im, left, top, right, bottom):
+    width = im.size[0]
+    height = im.size[1]
+
+    assert isinstance(left, int)
+    assert isinstance(top, int)
+    assert isinstance(right, int)
+    assert isinstance(bottom, int)
+    assert left >= 0 and left < width
+    assert top >= 0 and top < height
+    assert right >= 0 and right < width
+    assert bottom >= 0 and bottom < height
+    assert left <= right
+    assert top <= bottom
+
+    new_width = right - left
+    new_height = bottom - top
+
+    mode = get_image_mode(im)
+    new_im = Image.new(canonical_mode_name(mode), (new_width, new_height))
+    new_px = new_im.load()
+    px = canonical_mode(im).load()
+
+    for x in range(new_width):
+        for y in range(new_height):
+            new_px[x, y] = px[x + left, y + top]
+
+    return new_im

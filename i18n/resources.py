@@ -33,7 +33,12 @@ en_resources = {
     'addition': 'Addition',
     'subtraction': 'Subtraction',
     'multiplication': 'Multiplication',
+    'inverse': 'Inverse',
     'crop': 'Crop',
+    'left': 'Left:',
+    'right': 'Right:',
+    'top': 'Top:',
+    'bottom': 'Bottom:',
     'scaling': 'Scaling',
     'rotation': 'Rotation',
     'nearest': 'Nearest',
@@ -100,8 +105,8 @@ en_resources = {
     'grayscale': 'Grayscale',
     'binary': 'Binary',
     'ready': 'Ready',
-    'status_bar_text': 'Mode: %s  Position: (%d, %d)  Value: %s',
-    'status_bar_text_short': 'Mode: %s',
+    'status_bar_text': 'Size: %d x %d  Mode: %s  Position: (%d, %d)  Value: %s',
+    'status_bar_text_short': 'Size: %d x %d  Mode: %s',
     'unsaved_exit_prompt': 'Discard changes to file "%s" and exit?'
 }
 
@@ -138,7 +143,12 @@ zh_CN_resources = {
     'addition': '加法',
     'subtraction': '减法',
     'multiplication': '乘法',
+    'inverse': '反色',
     'crop': '剪裁',
+    'left': '左：',
+    'right': '右：',
+    'top': '上：',
+    'bottom': '下：',
     'scaling': '缩放',
     'rotation': '旋转',
     'nearest': '最近邻',
@@ -205,7 +215,7 @@ zh_CN_resources = {
     'grayscale': '灰度',
     'binary': '二值',
     'ready': '就绪',
-    'status_bar_text': '模式：%s  坐标：(%d, %d)  值：%s',
-    'status_bar_text_short': '模式：%s',
+    'status_bar_text': '尺寸：%d x %d  模式：%s  坐标：(%d, %d)  值：%s',
+    'status_bar_text_short': '尺寸：%d x %d  模式：%s',
     'unsaved_exit_prompt': '放弃对文件 "%s" 的修改并退出？'
 }
