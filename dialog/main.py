@@ -183,6 +183,10 @@ class MainDialog:
 
         self.detection_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['detection'], menu = self.detection_menu)
+        self.edge_detection_menu = tk.Menu(self.detection_menu, tearoff = False)
+        self.detection_menu.add_cascade(label = i18n['edge_detection'], menu = self.edge_detection_menu)
+        self.edge_detection_menu.add_command(label = i18n['sobel'], command = self.sobel)
+        self.edge_detection_menu.add_command(label = i18n['laplacian'], command = self.laplacian)
 
         self.help_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['help'], menu = self.help_menu)
@@ -475,7 +479,7 @@ class MainDialog:
     @transform_method
     def custom_filter(self, event = None):
         mid = MatrixInputDialog(self, i18n['custom_filter'], i18n['kernel'], transformation.sharpen_filter_kernel,
-            transformation.smooth_filter)
+            transformation.do_filter)
         mid()
         if mid.apply:
             self.version.add(self.im)
@@ -632,6 +636,14 @@ class MainDialog:
             mid()
             if mid.apply:
                 self.version.add(self.im)
+
+    @transform_method
+    def sobel(self, event = None):
+        self.version.add(transformation.sobel(self.im))
+
+    @transform_method
+    def laplacian(self, event = None):
+        self.version.add(transformation.laplacian(self.im))
 
     def on_close(self, event = None):
         if self.im and self.version.unsaved:

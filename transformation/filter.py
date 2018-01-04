@@ -25,7 +25,7 @@ def check_kernel(kernel):
 def get_kernel_width(kernel):
     return len(kernel) // 2
 
-def smooth_filter(im, kernel):
+def do_filter(im, kernel):
     if not check_kernel(kernel):
         raise TypeError(i18n['invalid_kernel'])
 
@@ -64,7 +64,7 @@ def smooth_filter(im, kernel):
 average_filter_kernel = [[1 / 9] * 3] * 3
 
 def average_filter(im):
-    return smooth_filter(im, average_filter_kernel)
+    return do_filter(im, average_filter_kernel)
 
 def median_9(x1, x2, x3, x4, x5, x6, x7, x8, x9):
     li = [x1, x2, x3, x4, x5, x6, x7, x8, x9]
@@ -124,6 +124,6 @@ def gaussian_kernel(kw, stdv):
     return kernel
 
 def gaussian_filter(im, kw, stdv):
-    return smooth_filter(im, gaussian_kernel(kw, stdv))
+    return do_filter(im, gaussian_kernel(kw, stdv))
 
 sharpen_filter_kernel = [[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]]
