@@ -235,11 +235,11 @@ skeleton_last_size = None
 
 @check_image_mode(ImageMode.BINARY)
 def binary_skeletonization(im, se):
-    ret_im = im
     et = im
+    ret_im = image_subtraction(et, binary_opening(et, se))
 
     global skeleton_last_sts, skeleton_last_se, skeleton_last_size
-    skeleton_last_sts = []
+    skeleton_last_sts = [ret_im]
     skeleton_last_se = se
     skeleton_last_size = im.size
 

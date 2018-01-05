@@ -180,6 +180,7 @@ class MainDialog:
             command = functools.partial(self.grayscale_morph_reconstruct, dilation = True))
         self.grayscale_morph_recon_menu.add_command(label = i18n['erosion'],
             command = functools.partial(self.grayscale_morph_reconstruct, dilation = False))
+        self.grayscale_morph_menu.add_command(label = i18n['watershed'])
 
         self.detection_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['detection'], menu = self.detection_menu)
@@ -187,6 +188,11 @@ class MainDialog:
         self.detection_menu.add_cascade(label = i18n['edge_detection'], menu = self.edge_detection_menu)
         self.edge_detection_menu.add_command(label = i18n['sobel'], command = self.sobel)
         self.edge_detection_menu.add_command(label = i18n['laplacian'], command = self.laplacian)
+        self.edge_detection_menu.add_command(label = i18n['canny'])
+        self.hough_transform_menu = tk.Menu(self.detection_menu, tearoff = False)
+        self.detection_menu.add_cascade(label = i18n['hough_transform'], menu = self.hough_transform_menu)
+        self.hough_transform_menu.add_command(label = i18n['line'])
+        self.hough_transform_menu.add_command(label = i18n['circle'])
 
         self.help_menu = tk.Menu(self.menu, tearoff = False)
         self.menu.add_cascade(label = i18n['help'], menu = self.help_menu)
