@@ -60,15 +60,20 @@ This project is supposed to run well on any major OS (Windows, Linux, macOS). It
 - `pillow` (for image reading and writing)
 - `numpy` and `matplotlib` (for histogram display)
 
-## About Performance
+## Appendixes
+- [A brief document](./附加部分说明.pdf) discribing project features and eyeball lesion detection.
+- [An eyeball image](./test_imgs/eyeball.jpg) provided by our instructor.
+
+## Further Improvements
+
+### Performance
 Python programs (interpreted) often run (much) slower than C++ programs (compiled). And image operations in this project are not optimized at all. So the program demonstates a poor performance when dragging some of the sliders (realtime calculation and display). Personally, I'm choosing Python for rapid development. Here are some possible methods to improve performance:
 - Use [PyPy](http://pypy.org/) to run the program (the JIT compiler)
 - Use matrix representation and operations provided by `numpy` (optimized C implementation)
 - Use C++ to develop the whole project or the algorithm modules
 
-## Appendixes
-- [A brief document](./附加部分说明.pdf) discribing project features and eyeball lesion detection.
-- [An eyeball image](./test_imgs/eyeball.jpg) provided by our instructor.
+### Alpha Support
+This program does not deal with alpha channels in images. They are simply discarded when reading images. A more complete implementation should deal with alpha channels appropriately in image operations.
 
 ## License
 - The eyeball image is provided by our instructor and can only be used for educational purposes.
