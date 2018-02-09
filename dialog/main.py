@@ -23,8 +23,6 @@ from .contrast_adjust import ContrastDialog
 from .gaussian_filter import GaussianFilterDialog
 from .matrix_input import MatrixInputDialog
 
-allowed_filetypes = [(i18n['image_files'], '*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tiff;*.webp'), (i18n['all_files'], '*.*')]
-
 def show_image_mode(im):
     mode = get_image_mode(im)
     if mode in [ImageMode.BINARY, ImageMode.GRAYSCALE, ImageMode.COLOR]:
@@ -66,6 +64,8 @@ class MainDialog:
         self.recent_dir = self.config['recent_dir']
         if self.config['language'] in i18n:
             i18n.language = self.config['language']
+        self.filetypes = [(i18n['image_files'], ('*.bmp', '*.jpg', '*.jpeg', '*.png', '*.gif', '*.tiff', '*.webp')),
+            (i18n['all_files'], '*')]
 
     def init_state(self):
         self.current_file = ''
@@ -243,7 +243,7 @@ class MainDialog:
 
     def open_file(self, event = None):
         filepath = filedialog.askopenfilename(title = i18n['open'], initialdir = self.recent_dir,
-            filetypes = allowed_filetypes)
+            filetypes = self.filetypes)
         if not filepath:
             return
 
@@ -281,7 +281,7 @@ class MainDialog:
 
         current_dir, current_filename = os.path.split(self.current_file)
         filepath = filedialog.asksaveasfilename(title = i18n['save_as'], initialdir = current_dir,
-            initialfile = current_filename, filetypes = allowed_filetypes)
+            initialfile = current_filename, filetypes = self.filetypes)
         if not filepath:
             return
 
@@ -337,7 +337,7 @@ class MainDialog:
     @transform_method
     def addition(self, event = None):
         filepath = filedialog.askopenfilename(title = i18n['select_another_image'], initialdir = self.recent_dir,
-            filetypes = allowed_filetypes)
+            filetypes = self.filetypes)
         if not filepath:
             return
 
@@ -353,7 +353,7 @@ class MainDialog:
     @transform_method
     def subtraction(self, event = None):
         filepath = filedialog.askopenfilename(title = i18n['select_another_image'], initialdir = self.recent_dir,
-            filetypes = allowed_filetypes)
+            filetypes = self.filetypes)
         if not filepath:
             return
 
@@ -369,7 +369,7 @@ class MainDialog:
     @transform_method
     def multiplication(self, event = None):
         filepath = filedialog.askopenfilename(title = i18n['select_another_image'], initialdir = self.recent_dir,
-            filetypes = allowed_filetypes)
+            filetypes = self.filetypes)
         if not filepath:
             return
 
@@ -566,7 +566,7 @@ class MainDialog:
     @transform_method
     def binary_morph_reconstruct(self, event = None, *, dilation):
         filepath = filedialog.askopenfilename(title = i18n['select_template_image'], initialdir = self.recent_dir,
-            filetypes = allowed_filetypes)
+            filetypes = self.filetypes)
         if not filepath:
             return
 
@@ -624,7 +624,7 @@ class MainDialog:
     @transform_method
     def grayscale_morph_reconstruct(self, event = None, *, dilation):
         filepath = filedialog.askopenfilename(title = i18n['select_template_image'], initialdir = self.recent_dir,
-            filetypes = allowed_filetypes)
+            filetypes = self.filetypes)
         if not filepath:
             return
 
