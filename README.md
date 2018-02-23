@@ -54,6 +54,9 @@ As required by our instructor, we should implement all algorithms by ourselves i
 
 Also, after finishing implementation, we should use our own tool to analyse eyeball images to detect lesion.
 
+## Screenshot
+![Screenshot](./screenshot.png)
+
 ## Environment
 This project is supposed to run well on any major OS (Windows, Linux, macOS). It requires Python 3, and you should have the following modules installed:
 - `tkinter` (for GUI)
