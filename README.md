@@ -1,10 +1,13 @@
 # SE342-simple-image-processor
 
 ## Introduction
+
 This is a repo which contains the project of the course **Computer Vision** (SE342) in SJTU in year 2017-2018.
 
 ## Project Requirements
+
 This project implements a simple image processing tool with the following functionalities:
+
 - Color Image Processing
   - [x] RGB Bands Splitting
   - [x] Color -> Grayscale
@@ -47,37 +50,46 @@ This project implements a simple image processing tool with the following functi
   - [ ] Watershed
 
 The program should have a convenient GUI, which can:
+
 - [x] Read / Save common image formats
-- [x] Display realtime cursor position and pixel value
+- [x] Display real-time cursor position and pixel value
 
 As required by our instructor, we should implement all algorithms by ourselves instead of directly calling functions of existing CV libraries (e.g. OpenCV). However, we can use such libraries to read and write images.
 
 Also, after finishing implementation, we should use our own tool to analyse eyeball images to detect lesion.
 
 ## Screenshot
+
 ![Screenshot](./screenshot.png)
 
 ## Environment
+
 This project is supposed to run well on any major OS (Windows, Linux, macOS). It requires Python 3, and you should have the following modules installed:
+
 - `tkinter` (for GUI)
 - `pillow` (for image reading and writing)
 - `numpy` and `matplotlib` (for histogram display)
 
 ## Appendixes
-- [A brief document](./附加部分说明.pdf) discribing project features and eyeball lesion detection.
+
+- [A brief document](./附加部分说明.pdf) describing project features and eyeball lesion detection.
 - [An eyeball image](./test_imgs/eyeball.jpg) provided by our instructor.
 
 ## Further Improvements
 
 ### Performance
-Python programs (interpreted) often run (much) slower than C++ programs (compiled). And image operations in this project are not optimized at all. So the program demonstates a poor performance when dragging some of the sliders (realtime calculation and display). Personally, I'm choosing Python for rapid development. Here are some possible methods to improve performance:
+
+Python programs (interpreted) often run (much) slower than C++ programs (compiled). And image operations in this project are not optimized at all. So the program demonstrates a poor performance when dragging some of the sliders (real-time calculation and display). Personally, I'm choosing Python for rapid development. Here are some possible methods to improve performance:
+
 - Use [PyPy](http://pypy.org/) to run the program (the JIT compiler)
 - Use matrix representation and operations provided by `numpy` (optimized C implementation)
 - Use C++ to develop the whole project or the algorithm modules
 
 ### Alpha Support
+
 This program does not deal with alpha channels in images. They are simply discarded when reading images. A more complete implementation should deal with alpha channels appropriately in image operations.
 
 ## License
+
 - The eyeball image is provided by our instructor and can only be used for educational purposes.
 - All the code in this repo follows the MIT license.
